@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 <script   src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"   integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="   crossorigin="anonymous"></script>
-	<script src='spectrum.js'></script>
+  <script src='spectrum.js'></script>
 <link rel='stylesheet' href='spectrum.css' />
 <style>
 #container{
@@ -14,6 +14,22 @@
 body{
   font-family:'Helvetica';
   color:#424242;
+}
+#undo{
+  width:50%;
+  padding:10px;
+  margin:15%;
+  border-radius:4px;
+  box-shadow:none;
+  font-size:1em;
+  border-style:none;
+  border:1px solid #6fccf7;
+  background-color:#f4fcff;
+  transition:background-color 1s ease;
+}
+#undo:hover{
+  cursor:pointer;
+  background-color:#c8e9f4;
 }
 #castle{
   float:left;
@@ -60,12 +76,15 @@ path:hover{
 }
 
 </style>
-	</head>
+  </head>
 <body>
+
+
 <div id="container">
   <div id="sidebar">
-    <h2>Choose from our predefined palette</h2>
+    <h2>Choose from our palette</h2>
      <div id="swatches">
+      <div id="current-swatch" style="width:180px; height:30px; border-radius:10px; background-color:#fff; border:1px solid #6fccf7; margin-bottom:2em;"></div>
          <div class="swatch" style="background-color:#6BCF2B; width:40px; height:40px; border-radius:20px;float:left;"></div>
          <div class="swatch" style="background-color:#B8FFCE; width:40px; height:40px; border-radius:20px;float:left;"></div>
          <div class="swatch" style="background-color:#9FFFBD; width:40px; height:40px; border-radius:20px;float:left;"></div>
@@ -88,6 +107,7 @@ path:hover{
       <h2>or choose your own colors!</h2>
       <input type='text' id="custom" />
       <button id="undo">undo</button>
+      <button id="save">save</button>
     </div>
   </div>
 
@@ -235,6 +255,8 @@ path:hover{
   -2 218 -3 217 -331 3 c-182 1 -333 -1 -337 -5z" style="position: relative;"></path>
   </g>
   </svg>
+ <canvas id="canvas" width=800 height=600>
+</canvas>
   </div>
 
 </div>
@@ -267,18 +289,18 @@ $(".sp-choose").click(function(){
       $("#selection", $swatches).attr('background-color');
       $("#selection", $swatches).attr('background-color');
       _currentFill = $swatch.css('background-color'); 
-  
+      $("#current-swatch").css('background-color', _currentFill);
     })
 
 
     $("#castle").click(function (event) {
       count++;
-      console.log(count);
+
       $color = _currentFill;
       change[event.target.id] = $color;
       allChanges.push(change);
       change = {};
-	     $(event.target).css('fill', _currentFill);
+       $(event.target).css('fill', _currentFill);
 
     });
 
@@ -291,6 +313,34 @@ $(".sp-choose").click(function(){
       $("#"+path).css('fill', oldFill);
       
     });
+</script>
+<script>
+$("#save").click(function(){
+var svgText = document.getElementById("castle").outerHTML;
+var myCanvas = document.getElementById("canvas");
+var ctxt = myCanvas.getContext("2d");
+
+function drawInlineSVG(ctx, rawSVG, callback) {
+
+    var svg = new Blob([rawSVG], {type:"image/svg+xml;charset=utf-8"}),
+        domURL = self.URL || self.webkitURL || self,
+        url = domURL.createObjectURL(svg),
+        img = new Image;
+
+    img.onload = function () {
+        ctx.drawImage(this, 0, 0);     
+        domURL.revokeObjectURL(url);
+        callback(this);
+    };
+
+    img.src = url;
+}
+
+// usage:
+drawInlineSVG(ctxt, svgText, function() {
+    console.log(canvas.toDataURL());  // -> PNG data-uri
+});
+});
 </script>
 
 </body>
